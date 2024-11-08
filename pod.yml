@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: shared-volume-pod
+spec:
+  volumes:
+    - name: shared-storage
+      emptyDir: {}  
+  containers:
+    - name: writer-1
+      image: busybox
+      command: ["/bin/sh", "-c"]
+      args:
+        - "while true; do echo 'Writer 1 is writing...' >> /shared-data/shared-file.txt; sleep 5; done"
+      volumeMounts:
+        - name: shared-storage
+          mountPath: /shared-data
+
+    - name: writer-2
+      image: busybox
+      command: ["/bin/sh", "-c"]
+      args:
+        - "while true; do echo 'Writer 2 is writing...' >> /shared-data/shared-file.txt; sleep 5; done"
+      volumeMounts:
+        - name: shared-storage
+          mountPath: /shared-data
+
+    - name: reader
+      image: busybox
+      command: ["/bin/sh", "-c"]
+      args:
+        - "while true; do cat /shared-data/shared-file.txt; sleep 10; done"
+      volumeMounts:
+        - name: shared-storage
+          mountPath: /shared-data
